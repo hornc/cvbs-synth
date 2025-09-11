@@ -17,9 +17,14 @@ width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])), add: center)])
 	))
 }),
 def2= SynthDef("maskedPicture", {
-	Out.ar(0, SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) * LFPulse.ar(freq:
-15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04, mul: LFPulse.kr(freq: 1/20,
-width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006, mul: 0.32)))
+	Out.ar(0,
+		SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) +
+		WhiteNoise.kr(mul: 0.2, add: 0.0) +
+		LFPulse.kr(freq: 1/60, width: 0.076, mult: 0.1, iphase: 0.1) +  // static bar
+		LFPulse.kr(freq: 1/61, width: 0.076, mult: 0.6) *               // moving bar
+		LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
+			mul: LFPulse.kr(freq: 1/20,
+			width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006, mul: 0.32)))
 });
 
 // add defs to SynthDescLib
