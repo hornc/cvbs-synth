@@ -26,4 +26,4 @@ ld-analyse pal01.tbc
 echo
 echo ======================================
 echo Export to video pal01.mkv:
-tbc-video-export pal01.tbc
+tbc-video-export --overwrite pal01.tbc

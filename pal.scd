@@ -7,7 +7,7 @@ var server = Server(\nrt,
 h = 0.2,
 center = -0.250,
 v = -0.00135,
-def = SynthDef("linePAL", {
+def1 = SynthDef("linePAL", {
 	Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640, 
 	mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
 	add: Mix( [ LFPulse.ar(freq: 125/4, width: 1-0.140625, iphase: 0.15, mul:
@@ -15,29 +15,42 @@ LFPulse.ar(freq: 1/20, width: 0.992, mul: h, add: -1 * h, iphase: 0.008 + v) , a
 0.0), LFPulse.ar(freq: 125/4, width: [0.078125], iphase: 0.151, mul: Mix(LFPulse.ar(freq: 1/20,
 width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])), add: center)]),
 	))
+}),
+def2= SynthDef("maskedPicture", {
+	Out.ar(0, SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) * LFPulse.ar(freq:
+15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04, mul: LFPulse.kr(freq: 1/20,
+width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006, mul: 0.32)))
 });
 
+// add defs to SynthDescLib
+def1.add;
+def2.add;
 
-def.add;  // add def to SynthDescLib
+x = Ppar([
+	Pbind(
+		\instrument, "linePAL",
+		\dur, Pseq([2], 1),
+	),
+	Pbind(
+		\instrument, "maskedPicture",
+		\dur, Pseq([2], 1),
+	),
+]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
 
 
-x = Pbind(
-	\instrument, "linePAL",
-	\dur, Pseq([2], 1),
-).asScore(625 * 0.064 * 6, timeOffset: 0.001);
+x.add([0.0, [\d_recv, def1.asBytes]]);
+x.add([0.0, [\d_recv, def2.asBytes]]);
 
-
-x.add([0.0, [\d_recv, def.asBytes]]);
 x.sort;
 
 
 x.recordNRT(
-    outputFilePath: "pal01.flac",
-    sampleRate: 28636,
-    headerFormat: "FLAC",
-    sampleFormat: "int8",
-    options: ServerOptions.new.numOutputBusChannels_(1),
-    duration: x.endTime 
+	outputFilePath: "pal01.flac",
+	sampleRate: 28636,
+	headerFormat: "FLAC",
+	sampleFormat: "int8",
+	options: ServerOptions.new.numOutputBusChannels_(1),
+	duration: x.endTime
 );
 
 
