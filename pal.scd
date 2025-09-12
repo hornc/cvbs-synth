@@ -14,11 +14,9 @@ maskpicture = {
               mul: 0.32))
 },
 pal = SynthDef("linePAL", { arg color = 0;
-	var burst = Select.ar(color, [ DC.ar(center),
-		LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
+	var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
 10, iphase: -0.09, mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0, mul: 0.1,
-add: 0.0), add: center )
-	]);
+add: 0.0)) * color + center;
 	Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640, 
 	mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
 	add: Mix( [ LFPulse.ar(freq: 125/4, width: 1-0.140625, iphase: 0.15, mul:
