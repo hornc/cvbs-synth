@@ -7,6 +7,12 @@ var server = Server(\nrt,
 h = 0.2,
 center = -0.250,
 v = -0.00135,
+maskpicture = {
+	LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
+              mul: LFPulse.kr(freq: 1/20,
+              width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006,
+              mul: 0.32))
+},
 def1 = SynthDef("linePAL", {
 	Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640, 
 	mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
@@ -32,10 +38,9 @@ add: 0.0) *
 add: 0.0) *
 		SinOsc.ar(freq: 10, mul: 1)) +   // modulate color amplitude
 		LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
-		LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *               // moving bar
-		LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
-			mul: LFPulse.kr(freq: 1/20,
-			width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006, mul: 0.32)))
+		LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *              // moving bar
+		maskpicture.value
+	)
 });
 
 // add defs to SynthDescLib
