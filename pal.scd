@@ -13,7 +13,7 @@ maskpicture = {
               width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006,
               mul: 0.32))
 },
-def1 = SynthDef("linePAL", {
+pal = SynthDef("linePAL", { arg color = 0;
 	Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640, 
 	mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
 	add: Mix( [ LFPulse.ar(freq: 125/4, width: 1-0.140625, iphase: 0.15, mul:
@@ -25,7 +25,7 @@ width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])),
 add: 0.0), add: center ))]),
 	))
 }),
-def2= SynthDef("maskedPicture", {
+picture = SynthDef("maskedPicture", {
 	Out.ar(0,
 		SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) +
 		// WhiteNoise.kr(mul: 0.2, add: 0.0) +
@@ -38,14 +38,14 @@ add: 0.0) *
 add: 0.0) *
 		SinOsc.ar(freq: 10, mul: 1)) +   // modulate color amplitude
 		LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
-		LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *              // moving bar
+		LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *     // moving bar
 		maskpicture.value
 	)
 });
 
 // add defs to SynthDescLib
-def1.add;
-def2.add;
+pal.add;
+picture.add;
 
 x = Ppar([
 	Pbind(
@@ -59,8 +59,8 @@ x = Ppar([
 ]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
 
 
-x.add([0.0, [\d_recv, def1.asBytes]]);
-x.add([0.0, [\d_recv, def2.asBytes]]);
+x.add([0.0, [\d_recv, pal.asBytes]]);
+x.add([0.0, [\d_recv, picture.asBytes]]);
 
 x.sort;
 
