@@ -50,7 +50,7 @@ width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])),
 picture = SynthDef("maskedPicture", {
 	Out.ar(0,
 		SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) +
-		// WhiteNoise.kr(mul: 0.2, add: 0.0) +
+		WhiteNoise.kr(mul: 0.4, add: 0.0) +
 		(SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: -0.25, mul:
 0.5,  // color signal
 add: 0.0) *
@@ -59,9 +59,10 @@ add: 0.0) *
 0.5,  // color signal
 add: 0.0) *
 		SinOsc.ar(freq: 10, mul: 1)) *   // modulate color amplitude
-		//LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
-		//LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *     // moving bar
-		maskpicture.value
+		// LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
+		// LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.7) *     // moving bar
+		maskpicture.value *
+		LFPulse.kr(freq: 1/2, width: SinOsc.ar(freq: 111, mul: 0.7), iphase: 0.27)
 	)
 });
 
@@ -115,7 +116,7 @@ x = Ppar([
 		\height, [0.1, 0.35, 0.1, 0.1],
 		\dur, Pseq([2], 1),
 	),
-]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
+]).asScore(625 * 0.064 * 120, timeOffset: 0.001);
 
 
 x.add([0.0, [\d_recv, pal.asBytes]]);
