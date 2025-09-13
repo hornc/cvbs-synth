@@ -23,10 +23,10 @@ hbar = SynthDef("hBar", {arg brightness = 1, height = 0.1, y = 0.0;
 scale * y - 0.055, mul: brightness) * maskpicture.value)
 }),
 //  x : 0 to 720, y : 0 to 567 (PAL)
-hline = SynthDef("hLine", {arg brightness = 1, length = 0.1, x = 0, y = 0;
-	var scale = 0.9145;
-	Out.ar(0, LFPulse.ar(freq: 1/40, width: 0.0005 , iphase: -1 *
- (x / 576 / 720 * 0.74) - 0.02906, mul: brightness) * maskpicture.value)
+hline = SynthDef("hLine", {arg brightness = 1, length = 1, x = 0, y = 0;
+	var scale = 0.74;
+	Out.ar(0, LFPulse.ar(freq: 1/40, width: length / (576 * 720) * scale, iphase: -1 *
+ (x / 576 / 720 * scale) - (y / 576 / 2) * 0.9218 - 0.02906, mul: brightness) * maskpicture.value)
 }),
 pal = SynthDef("linePAL", { arg color = 0;
 	var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
@@ -69,10 +69,9 @@ vbar.add;
 x = Ppar([
 	Pbind(
 		\instrument, "linePAL",
-		\color, 0,
+		\color, 1,
 		\dur, Pseq([2], 1),
 	),
-/*
 	Pbind(
 		\instrument, "maskedPicture",
 		\dur, Pseq([2], 1),
@@ -84,7 +83,7 @@ x = Ppar([
 		\width, 0.1,
 		\dur, Pseq([2], 1),
 	),
-*/
+/*
 	Pbind(
 		\instrument, "hBar",
 		\y, [0.0, 0.3, 0.5, 0.9],
@@ -92,11 +91,12 @@ x = Ppar([
 		\height, 0.1,
 		\dur, Pseq([2], 1),
 	),
+*/
 	Pbind(
 		\instrument, "hLine",
-		\x, [0, 720 / 2, 0],
-		\y, [0, 0, 3],  // max: 576
-		\length, 10,
+		\x, [0, 720 / 2, 1, 0, 10],
+		\y, [0, 0, 4, 8, 10],  // max: 576, only even rows
+		\length, [10, 50, 10, 10, 10],
 		\dur, Pseq([2], 1),
 	),
 ]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
