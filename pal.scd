@@ -28,6 +28,12 @@ hline = SynthDef("hLine", {arg brightness = 1, length = 1, x = 0, y = 0;
 	Out.ar(0, LFPulse.ar(freq: 1/40, width: length / (576 * 720) * scale, iphase: -1 *
  (x / 576 / 720 * scale) - (y / 576 / 2) * 0.9218 - 0.02906, mul: brightness) * maskpicture.value)
 }),
+box = SynthDef("Box", {arg brightness = 1, width = 0.1, x = 0.0, height = 0.1, y = 0.0;
+	var xscale = 0.8, yscale = 0.9145;
+	Out.ar(0, LFPulse.ar(freq: 125/8, width: width * xscale, iphase: -1 * xscale * x - 0.161, mul: brightness) *
+	LFPulse.ar(freq: 1/20, width: height * yscale, iphase: -1 * yscale * y - 0.055) *
+	maskpicture.value)
+}),
 pal = SynthDef("linePAL", { arg color = 0;
 	var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
 10, iphase: -0.09, mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0, mul: 0.1,
@@ -65,6 +71,7 @@ picture.add;
 hbar.add;
 hline.add;
 vbar.add;
+box.add;
 
 x = Ppar([
 	Pbind(
@@ -99,6 +106,15 @@ x = Ppar([
 		\length, [10, 50, 10, 10, 10],
 		\dur, Pseq([2], 1),
 	),
+	Pbind(
+		\instrument, "Box",
+		\x, [0.35, 0.35, 0.35, 0.4],
+		\y, [0, 0.5, 0.9, 0.2],
+		\brightness, [1, 0.5],
+		\width, [0.1, 0.1, 0.1, 0.35],
+		\height, [0.1, 0.35, 0.1, 0.1],
+		\dur, Pseq([2], 1),
+	),
 ]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
 
 
@@ -107,6 +123,7 @@ x.add([0.0, [\d_recv, picture.asBytes]]);
 x.add([0.0, [\d_recv, hbar.asBytes]]);
 x.add([0.0, [\d_recv, hline.asBytes]]);
 x.add([0.0, [\d_recv, vbar.asBytes]]);
+x.add([0.0, [\d_recv, box.asBytes]]);
 
 x.sort;
 
