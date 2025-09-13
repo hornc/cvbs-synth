@@ -13,6 +13,10 @@ maskpicture = {
               width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006,
               mul: 0.32))
 },
+vbar = SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.1;
+	var scale = 0.8;
+	Out.ar(0, LFPulse.ar(freq: 125/8, width: width * scale, iphase: -1 * scale * x - 0.161, mul: brightness) * maskpicture.value)
+}),
 pal = SynthDef("linePAL", { arg color = 0;
 	var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
 10, iphase: -0.09, mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0, mul: 0.1,
@@ -37,9 +41,9 @@ add: 0.0) *
 		(SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.25, mul:
 0.5,  // color signal
 add: 0.0) *
-		SinOsc.ar(freq: 10, mul: 1)) +   // modulate color amplitude
-		LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
-		LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *     // moving bar
+		SinOsc.ar(freq: 10, mul: 1)) *   // modulate color amplitude
+		//LFPulse.kr(freq: 1/60, width: 0.076, iphase: 0.4) +  // static bar
+		//LFPulse.kr(freq: 1/61, width: 0.076, mul: 0.2) *     // moving bar
 		maskpicture.value
 	)
 });
@@ -47,6 +51,7 @@ add: 0.0) *
 // add defs to SynthDescLib
 pal.add;
 picture.add;
+vbar.add;
 
 x = Ppar([
 	Pbind(
@@ -58,11 +63,19 @@ x = Ppar([
 		\instrument, "maskedPicture",
 		\dur, Pseq([2], 1),
 	),
+	Pbind(
+		\instrument, "vBar",
+		\x, [0.0, 0.2, 0.5, 0.7, 0.9],
+		\brightness, [1, 0.5, 0.25, 0.6, 0.8],
+		\width, 0.1,
+		\dur, Pseq([2], 1),
+	),
 ]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
 
 
 x.add([0.0, [\d_recv, pal.asBytes]]);
 x.add([0.0, [\d_recv, picture.asBytes]]);
+x.add([0.0, [\d_recv, vbar.asBytes]]);
 
 x.sort;
 
