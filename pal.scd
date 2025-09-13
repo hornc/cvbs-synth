@@ -13,9 +13,14 @@ maskpicture = {
               width: 0.976 - 0.004 - 0.008, iphase: -0.003 - 0.006,
               mul: 0.32))
 },
-vbar = SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.1;
+vbar = SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.0;
 	var scale = 0.8;
 	Out.ar(0, LFPulse.ar(freq: 125/8, width: width * scale, iphase: -1 * scale * x - 0.161, mul: brightness) * maskpicture.value)
+}),
+hbar = SynthDef("hBar", {arg brightness = 1, height = 0.1, y = 0.0;
+	var scale = 0.9145;
+	Out.ar(0, LFPulse.ar(freq: 1/20, width: height * scale, iphase: -1 *
+scale * y - 0.055, mul: brightness) * maskpicture.value)
 }),
 pal = SynthDef("linePAL", { arg color = 0;
 	var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
@@ -51,6 +56,7 @@ add: 0.0) *
 // add defs to SynthDescLib
 pal.add;
 picture.add;
+hbar.add;
 vbar.add;
 
 x = Ppar([
@@ -70,11 +76,19 @@ x = Ppar([
 		\width, 0.1,
 		\dur, Pseq([2], 1),
 	),
+	Pbind(
+		\instrument, "hBar",
+		\y, [0.0, 0.3, 0.5, 0.9],
+		\brightness, [1, 0.5],
+		\height, 0.1,
+		\dur, Pseq([2], 1),
+	),
 ]).asScore(625 * 0.064 * 20, timeOffset: 0.001);
 
 
 x.add([0.0, [\d_recv, pal.asBytes]]);
 x.add([0.0, [\d_recv, picture.asBytes]]);
+x.add([0.0, [\d_recv, hbar.asBytes]]);
 x.add([0.0, [\d_recv, vbar.asBytes]]);
 
 x.sort;
