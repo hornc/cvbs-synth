@@ -37,6 +37,7 @@ Bash build script e.g.:
 
 Will generate `output.flac` -> `output.tbc` -> `output.mkv`
 
+![Screenshot of Hello World example, PAL video output](Images/helloworld.png)
 
 ch.
  Sep 2025
