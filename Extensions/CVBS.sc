@@ -47,17 +47,20 @@
 
 	// PAL line and frame sync for black / empty video signal
 	// optional color burst signal via color arg
-	SynthDef("linePAL", { arg color = 0;
-		var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
-		10, iphase: -0.09, mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0, mul: 0.1,
-		add: 0.0)) * color + center;
-		Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640, 
-		mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
-		add: Mix( [ LFPulse.ar(freq: 125/4, width: 1-0.140625, iphase: 0.15, mul:
-		LFPulse.ar(freq: 1/20, width: 0.992, mul: h, add: -1 * h, iphase: 0.008 + v) , add:
-		0.0), LFPulse.ar(freq: 125/4, width: [0.078125], iphase: 0.151, mul: Mix(LFPulse.ar(freq: 1/20,
-		width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])),
-		add: burst)])
+	SynthDef("linePAL", {arg color = 0;
+		var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) * 10, iphase: -0.09,
+			mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0,
+				mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -0.1)  // no color bursts between frames
+			)) * color + center;
+		Out.ar(0, LFPulse.ar(freq: 15.625, width: 47/640,
+			mul: LFPulse.kr(freq: 1/20, width: 0.976, iphase: -0.001, mul: -1 * h),
+			add: Mix([
+				LFPulse.ar(freq: 125/4, width: 1-0.140625, iphase: 0.15,
+					mul: LFPulse.ar(freq: 1/20, width: 0.992, mul: h, add: -1 * h, iphase: 0.008 + v), add: 0.0),
+				LFPulse.ar(freq: 125/4, width: [0.078125], iphase: 0.151,
+					mul: Mix(LFPulse.ar(freq: 1/20, width: 0.992, mul: h, add: -1 * h, iphase:[0.0 + v, 0.016 + v])),
+					add: burst)
+				])
 		))
 	}).add;
     }

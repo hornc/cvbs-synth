@@ -21,13 +21,14 @@ Video decoding software to confirm output: [CVBS-Decode](https://github.com/oyvi
 
 Copy the contents of this repo's `Extensions/` folder (`CVBS.sc`) to your [SuperCollider Extensions folder](https://doc.sccode.org/Guides/UsingExtensions.html) under a new folder named `CVBS/` to make the CVBS SynthDefs available to SuperCollider scripts.
 
-Examples can be found in the [Examples/](./Examples/) folder. The scripts use SuperCollider's non-realtime (NRT) synthesis to generate mono .flac audio files @ 28.6KHz
+Examples can be found in the [Examples/](./Examples/) folder. The scripts use SuperCollider's [non-realtime (NRT) synthesis](https://doc.sccode.org/Guides/Non-Realtime-Synthesis.html) to generate mono `.flac` audio files @ 28.6KHz.
 
 These are recognised as input to CVBS decode as 28.6 MHz/8-bit (8fsc) Stock Crystal Native 8xFsc 8bit Unsigned Sampling Mode (with the `--cxadc` flag).
 Note the 1000x difference in 28.6 _KILO_ Hz _audio_ output to 28.6 _MEGA_ Hz video input.
 This 1000x difference is what allows us to use audio synthesis techniques to generate the higher frequency video signals.
 
-Playing these signals on real hardware will require playback at 1000x the frequency. I have yet to fully explore the hardware of the VHS decode project and am just playing with software synthesis and playback for now.
+Playing these signals on real hardware will require playback at 1000x the frequency.
+I have yet to fully explore the hardware of the VHS decode project and am just playing with software synthesis and playback for now.
 
 ## Usage
 
