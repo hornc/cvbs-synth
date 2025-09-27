@@ -8,6 +8,7 @@
 	var center = -0.250;
 	var v = -0.00135;
 
+	// Envelope mask to zero a signal (multiply) before mixing (adding) to the PAL frame and line sync signal (linePAL)
 	var maskpicture = {
 		LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
 		      mul: LFPulse.kr(freq: 1/20,
@@ -15,11 +16,13 @@
 		      mul: 0.32))
 	};
 
+	// Vertical bar
 	SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.0;
 	    var scale = 0.8;
 	    Out.ar(0, LFPulse.ar(freq: 125/8, width: width * scale, iphase: -1 * scale * x - 0.161, mul: brightness) * maskpicture.value)
 	}).add;
 
+	// Horizontal bar
 	SynthDef("hBar", {arg brightness = 1, height = 0.1, y = 0.0;
 	    var scale = 0.9145;
 	    Out.ar(0, LFPulse.ar(freq: 1/20, width: height * scale, iphase: -1 *
@@ -27,6 +30,7 @@
 	}).add;
 
 
+	// Horizontal line (1 pixel high)
 	//  x : 0 to 720, y : 0 to 567 (PAL)
 	SynthDef("hLine", {arg brightness = 1, length = 1, x = 0, y = 0;
 		var scale = 0.74;
@@ -34,6 +38,7 @@
 	 (x / 576 / 720 * scale) - (y / 576 / 2) * 0.9218 - 0.02906, mul: brightness) * maskpicture.value)
 	}).add;
 
+	// Box drawing
 	SynthDef(\Box, {arg brightness = 1, width = 0.1, x = 0.0, height = 0.1, y = 0.0;
 	    var xscale = 0.8, yscale = 0.9145;
 	    Out.ar(0, LFPulse.ar(freq: 125/8, width: width * xscale, iphase: -1 * xscale * x - 0.161, mul: brightness) *
@@ -41,6 +46,8 @@
 	    maskpicture.value)
 	}).add;
 
+	// PAL line and frame sync for black / empty video signal
+	// optional color burst signal via color arg
 	SynthDef("linePAL", { arg color = 0;
 		var burst = LFPulse.ar(freq: 15.625, width: 15625 / (283.75 * 15625 + 25) *
 	10, iphase: -0.09, mul: SinOsc.ar(freq: (283.75 * 15625 + 25) / 1000, phase: 0.0, mul: 0.1,
@@ -55,6 +62,9 @@
 		))
 	}).add;
 
+
+	// TODO: remove from shared library, this is an example 'image'
+	// move to pal.scd
 	SynthDef("maskedPicture", {
 	    Out.ar(0,
 		    SinOsc.ar(freq: 124.005, phase: 0.0, mul: 0.32, add: 0.25) +
