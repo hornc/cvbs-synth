@@ -6,27 +6,30 @@ SPACE = 25  # monospace width
 
 def hLine(data):
     x, y, length = data
-    output = rf"""     Pbind(  
-                \instrument, "hLine",
-                \x, {x},
-                \y, {y},  // max: 576, only even rows
-                \length, {length},
-                \dur, Pseq([2], 1)
-        )"""
+    output = rf"""    Pbind(
+        \instrument, "hLine",
+        \x, {x},
+        \y, {y},  // max: 576, only even rows
+        \length, {length},
+        \dur, Pseq([2], 1)
+    )"""
     return output
+
+def fmt(values: list):
+    return str(["{:.4f}".format(v) for v in values]).replace("'", "")
 
 
 def vBox(data):
     x, y, w, h = data
-    output = rf"""     Pbind(  
-                \instrument, "Box",
-                \x, {x},
-                \y, {y},
-                \brightness, 1,
-                \width, {w},
-                \height, {h},
-                \dur, Pseq([2], 1)
-        )"""
+    output = rf"""    Pbind(
+        \instrument, "Box",
+        \x, {fmt(x)},
+        \y, {fmt(y)},
+        \brightness, 1,
+        \width, {fmt(w)},
+        \height, {fmt(h)},
+        \dur, Pseq([2], 1)
+    )"""
     return output
 
 
@@ -36,7 +39,7 @@ font = {
     'H': [[[0], [-10], [20]], [[0, 20],[-20, -20],[2, 2],[20, 20]]],
     'E': [[[0,0,0], [0,-10,-20], [20,15,20]], [[0],[-20],[2],[20]]],
     'L': [[[0], [0], [20]], [[0],[-20],[2],[20]]],
-    'O': [[[7,7], [0,-20], [10,10]], [[0, 20],[-18, -18],[2, 2],[15, 15]]],
+    'O': [[[5,5], [0,-20], [10,10]], [[0, 20],[-18, -18],[2, 2],[15, 15]]],
     'W': [[[0], [0], [20]], [[0, 10, 20],[-20,-10,-20],[2,2,2],[20,10, 20]]],
     'R': [[[0], [-16], [18]], [[0],[-20],[2],[20]]],
     'D': [[[2,2], [0,-20], [10,10]], [[0, 20],[-18, -15],[2, 2],[15, 10]]],
@@ -48,15 +51,12 @@ W = 720
 H = 576
 def screenConv(box):
     # x, y, w, h
-    xpad = 21 
-    xscale = 0.93
     ypad = 3
     if not len(box[0]):
         return box
     new = [[], [], [], []]
     for i, v in enumerate(box[0]):
-        v += xpad
-        new[0].append(v/W * xscale)
+        new[0].append(v/W)
     for i, v in enumerate(box[1]):
         v += ypad
         new[1].append(v/H)
@@ -101,8 +101,8 @@ def text(s: str, x: int, y: int):
         x += SPACE
     h = hLine(horizontal)
     v = vBox(vertical)
-    print(f"// {s}")
-    print(f"{h},\n{v}")
+    print(f"\t// {s}")
+    print(f"{h.replace(' '*4, chr(9))},\n{v.replace(' '*4, chr(9))}")
 
 
 if __name__ == '__main__':
