@@ -1,8 +1,8 @@
 (
 var server = Server(\nrt,
 	options: ServerOptions.new
-	.numOutputBusChannels_(2)
-	.numInputBusChannels_(2)
+	.numOutputBusChannels_(1)
+	.numInputBusChannels_(1)
 );
 
 // Add CVBS SynthDefs
@@ -47,6 +47,7 @@ x = Ppar([
 	)
 ]).asScore(625 * 0.064 * 40, timeOffset: 0.001);
 
+// Add the CVBS Extension SynthDefs asBytes to the Score
 Object.namesCVBS.do { |name|
 	x.add([0.0, [\d_recv, SynthDescLib.global.at(name).def.asBytes]]);
 };

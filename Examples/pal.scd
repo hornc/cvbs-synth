@@ -1,8 +1,8 @@
 (
 var server = Server(\nrt,
 	options: ServerOptions.new
-	.numOutputBusChannels_(2)
-	.numInputBusChannels_(2)
+	.numOutputBusChannels_(1)
+	.numInputBusChannels_(1)
 ),
 picture = SynthDef("maskedPicture", {
 	Out.ar(0,
@@ -82,6 +82,5 @@ x.recordNRT(
 );
 
 server.remove;
-"Script finished, quitting...".postln;
 0.exit;
 )

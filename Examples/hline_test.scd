@@ -1,8 +1,8 @@
 (
 var server = Server(\nrt,
 	options: ServerOptions.new
-	.numOutputBusChannels_(2)
-	.numInputBusChannels_(2)
+	.numOutputBusChannels_(1)
+	.numInputBusChannels_(1)
 );
 
 // Add CVBS SynthDefs
