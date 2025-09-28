@@ -29,10 +29,10 @@
 	}).add;
 
 	// Horizontal line (1 pixel high)
-	//  x : 0 to 720, y : 0 to 567 (PAL)
+	//  x : 0 to 720, y : 0 to 576 (PAL)
 	SynthDef("hLine", {arg brightness = 1, length = 1, x = 0, y = 0;
-		var scale = 0.74;
-		Out.ar(0, LFPulse.ar(freq: 1/40, width: length / (576 * 720) * scale, iphase: -1 * (x / 576 / 720 * scale) - (y / 576 / 2) * 0.9218 - 0.02906,
+		var scale = 0.74, w = 576, yscale = 0.9216;
+		Out.ar(0, LFPulse.ar(freq: 1/40, width: length / (w * 720) * scale, iphase: -1 * (x / w / 720 * scale) - ((y / w / 2) * yscale) - 0.02906,
 			mul: brightness) * Object.maskpicture.value)
 	}).add;
 
