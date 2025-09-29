@@ -75,6 +75,14 @@ x = Ppar([
 		\length, 100,
 		\dur, Pseq([2], 1)
 	),
+	// Min and Max y
+	Pbind(
+		\instrument, "hLine",
+		\x, 100,
+		\y, [0, 4, 8, 572, 568, 564],
+		\length, [100, 80],
+		\dur, Pseq([2], 1)
+	),
 ]).asScore(625 * 0.064 * 80, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
 					          // TODO: first frame is dropped?? FIX
 
