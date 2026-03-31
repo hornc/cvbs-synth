@@ -1,6 +1,6 @@
 # CVBS synth
 
-Use a software audio synthesis tool to generate analog video (CVBS / composite / that yellow RCA connector)
+Use a software audio synthesis tool to generate analog video [(CVBS / composite / that yellow RCA connector)](https://en.wikipedia.org/wiki/Composite_video)
 
 Audio synthesis: [SuperCollider](https://supercollider.github.io/)
 
