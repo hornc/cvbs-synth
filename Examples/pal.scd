@@ -78,9 +78,10 @@ x.recordNRT(
 	headerFormat: "FLAC",
 	sampleFormat: "int8",
 	options: ServerOptions.new.numOutputBusChannels_(1),
-	duration: x.endTime
+	duration: x.endTime,
+	action: {
+		"CVBS-synth NRT render finished successfully.".postln;
+		0.exit;
+	}
 );
-
-server.remove;
-0.exit;
 )
