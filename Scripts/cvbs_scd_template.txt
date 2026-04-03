@@ -1,0 +1,43 @@
+(
+var server = Server(\nrt,
+	options: ServerOptions.new
+	.numOutputBusChannels_(1)
+	.numInputBusChannels_(1)
+);
+
+// Add CVBS SynthDefs
+Object.defineCVBS;
+
+x = Ppar([
+	Pbind(
+		\instrument, "linePAL",
+		\color, 0,
+		\dur, Pseq([2], 1),
+	),
+	// Min and Max y
+	Pbind(
+		\instrument, "hLine",
+                // REPLACE_HERE //
+		\dur, Pseq([2], 1)
+	),
+]).asScore(625 * 0.064 * 12, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
+
+Object.namesCVBS.do { |name|
+	x.add([0.0, [\d_recv, SynthDescLib.global.at(name).def.asBytes]]);
+};
+
+x.sort;
+
+x.recordNRT(
+	outputFilePath: "output.flac",
+	sampleRate: 28636,
+	headerFormat: "FLAC",
+	sampleFormat: "int8",
+	options: ServerOptions.new.numOutputBusChannels_(1),
+	duration: x.endTime,
+	action: {
+		"CVBS-synth NRT render finished successfully.".postln;
+		0.exit;
+	}
+);
+)
