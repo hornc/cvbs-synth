@@ -18,11 +18,33 @@ REPLACE = "// REPLACE_HERE //"
 OUTFILE = dir_path + "/../Examples/CharlotteMoorman1968_portrait.scd"
 
 
+class hImage:
+    """
+    An image frame made from (horizontal) line segments.
+    """
+    def __init__(self):
+        self.x = []
+        self.y = []
+        self.bright = []
+        self.length = []
+
+    def check(self):
+        for l in [self.x, self.y, self.bright, self.length]:
+            print("CHECK:", len(l))
+        assert len(self.x) == len(self.y) == len(self.bright) == len(self.length)
+
+    def output(self):
+        r = f"""
+                \\x, {self.x},
+                \\y, {self.y},
+                \\length, {self.length},
+                \\brightness, {self.bright},
+    """
+        return r
+
+
 def output_hline(lines):
-    x = []
-    y = []
-    bright = []
-    lengths = []
+    frame = hImage()
     for i, line in enumerate(lines):
         if i < Y_OFFSET:
             continue
@@ -32,32 +54,24 @@ def output_hline(lines):
         for segment in line:
             br = segment[0] / 4
             if needs_len:
-                len_ = segment[1] - x[-1]
-                lengths.append(len_)
+                len_ = segment[1] - frame.x[-1]
+                frame.length.append(len_)
             if br == 0:
                 needs_len = False
                 continue
-            y.append(i)
-            x.append(segment[1])
             br += 0.25
-            bright.append(br)
+            frame.y.append(i)
+            frame.x.append(segment[1])
+            frame.bright.append(br)
             needs_len = True
         if needs_len:  # close off the last segment in the line, if needed
-            len_ = MAX_X - x[-1]
+            len_ = MAX_X - frame.x[-1]
             if len_ > 10:
                 len_ -= 5
-            lengths.append(len_)
+            frame.length.append(len_)
 
-    for l in [x, y, bright, lengths]:
-        print("CHECK:", len(l))
-
-    output = f"""
-                \\x, {x},
-                \\y, {y},
-                \\length, {lengths},
-                \\brightness, {bright},
-    """
-    return output
+    frame.check()
+    return frame.output()
 
 
 def main():
