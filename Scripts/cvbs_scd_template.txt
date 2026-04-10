@@ -14,12 +14,8 @@ x = Ppar([
 		\color, 0,
 		\dur, Pseq([2], 1),
 	),
-	// Min and Max y
-	Pbind(
-		\instrument, "hLine",
-                // REPLACE_HERE //
-		\dur, Pseq([2], 1)
-	),
+	// (part) hLine frame Pbind(s):
+        // REPLACE_HERE //
 ]).asScore(625 * 0.064 * 12, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
 
 Object.namesCVBS.do { |name|

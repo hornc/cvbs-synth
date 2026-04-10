@@ -5,10 +5,10 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__)) 
 
-Y_OFFSET = 276
+Y_OFFSET = 76  # was 276
 #MAX_Y = 576
 #MAX_Y = 116
-MAX_Y = 316
+MAX_Y = 520
 MAX_X = 530  # max 834
 
 MIN_LENGTH = 20
@@ -33,12 +33,27 @@ class hImage:
             print("CHECK:", len(l))
         assert len(self.x) == len(self.y) == len(self.bright) == len(self.length)
 
+    def split(self, n=2):
+        # split hImage into n hImages
+        r = [hImage() for i in range(n)]
+        d = len(self.x) // n
+        for i in range(n):
+            r[i].x = self.x[i*d:(i+1)*d]
+            r[i].y = self.y[i*d:(i+1)*d]
+            r[i].bright = self.bright[i*d:(i+1)*d]
+            r[i].length = self.length[i*d:(i+1)*d]
+        return r
+
     def output(self):
         r = f"""
+        Pbind(
+                \\instrument, "hLine",
                 \\x, {self.x},
                 \\y, {self.y},
                 \\length, {self.length},
                 \\brightness, {self.bright},
+                \\dur, Pseq([2], 1)
+        ),
     """
         return r
 
@@ -71,7 +86,14 @@ def output_hline(lines):
             frame.length.append(len_)
 
     frame.check()
-    return frame.output()
+    r = frame.split(8)
+    for f in r:
+        print(f' Checking {f}...')
+        f.check()
+    return ''.join([f.output() for f in [r[0], r[2], r[4], r[5], r[-1]]])  # 195 * 5 = 975 < 1024 synth limit
+    # TODO: develop a better instrument to follow the scan lines in one synth
+    # current hLine approach is using one synth per _line segment of a consistent brightness_
+    # which is extremely wasteful.
 
 
 def main():
@@ -104,9 +126,6 @@ def main():
 
         # Don't forget the last segment of the row
         lines.append(current_line)
-
-    for line in lines:
-        print(line)
 
     output = output_hline(lines)
     print(output)
