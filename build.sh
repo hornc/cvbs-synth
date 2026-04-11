@@ -9,22 +9,33 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
+SC_EXT_PATH=$(sclang -l /dev/null <<EOF | grep "^/.*Extensions$" | head -n 1
+Platform.userExtensionDir.postln;
+0.exit;
+EOF
+)
+
 script=$1
+
 # likely flakey:
 flac=$(grep outputFilePath $1 | grep -o "\w*\.flac")  # e.g. output.flac
 
+echo Copying CVBS extension to $SC_EXT_PATH ...
+cp Extensions/CVBS.sc $SC_EXT_PATH/CVBS/.
 echo Building PAL CVBS waveform using Supercolider script $script...
 
 echo
 echo ======================================
 echo Generating Audio FLAC $flac ...
 echo
+rm $flac
 sclang $script
 
 echo
 echo ======================================
 echo Decoding CVBS from $flac ... 
 echo
+rm output.tbc
 cvbs-decode --debug --overwrite --cxadc --pal -A $flac output
 
 echo
