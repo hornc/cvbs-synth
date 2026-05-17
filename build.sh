@@ -14,6 +14,8 @@ Platform.userExtensionDir.postln;
 0.exit;
 EOF
 )
+# Previous is fragile if the extension has syntax errors, try a sensible default:
+SC_EXT_PATH=${SC_EXT_PATH:-~/.local/share/SuperCollider/Extensions}
 
 script=$1
 
@@ -21,7 +23,12 @@ script=$1
 flac=$(grep outputFilePath $1 | grep -o "\w*\.flac")  # e.g. output.flac
 
 echo Copying CVBS extension to $SC_EXT_PATH ...
-cp Extensions/CVBS.sc $SC_EXT_PATH/CVBS/.
+cp Extensions/CVBS.sc $SC_EXT_PATH/CVBS/
+if [ $? -ne 0 ]; then
+    echo "Unable to copy CVBS library to $SC_EXT_PATH/CVBS/ aborting!"
+    exit 1
+fi
+
 echo Building PAL CVBS waveform using Supercolider script $script...
 
 echo
