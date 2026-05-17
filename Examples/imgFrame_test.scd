@@ -5,6 +5,8 @@ var server = Server(\nrt,
 	.numInputBusChannels_(1)
 );
 
+var amps = [1.0, 0.2, 0.5, 0.1, 0.8];
+
 // Add CVBS SynthDefs
 Object.defineCVBS;
 
@@ -16,11 +18,16 @@ x = Ppar([
 	),
 	Pbind(
 		\instrument, "imgFrame",
-		\freq, [440, 1603],
-		\brightness, [1, 0.8, 0.5],
+		\freq, 1500,
+		\bufnum, 0,
+		\brightness, 1,
 		\dur, Pseq([2], 1),
 	),
-]).asScore(625 * 0.064 * 80, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
+]).asScore(625 * 0.064 * 20, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
+
+// Add the Buffer to the score
+x.add([0.0, [\b_alloc, 0, 64, 1]]);
+x.add([0.0, [\b_gen, 0, "sine1", 7] ++ amps]);
 
 Object.namesCVBS.do { |name|
 	x.add([0.0, [\d_recv, SynthDescLib.global.at(name).def.asBytes]]);

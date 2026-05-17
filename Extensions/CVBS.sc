@@ -3,6 +3,7 @@
 
 + Object {
     namesCVBS { ^['vBar', 'hBar', 'hLine', 'Box', 'imgFrame', 'linePAL']; }
+
     // Envelope mask to zero a signal (multiply) before mixing (adding) to the PAL frame and line sync signal (linePAL)
     maskpicture {
 	^LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
@@ -14,7 +15,8 @@
     defineCVBS {
 	var h = 0.2,
 	center = -0.250,
-	v = -0.00135;
+	v = -0.00135,
+	frame = 40;  // Frame audio duration 40s = 1/25Hz * 1000(scale)
 
 	// Vertical bar
 	SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.0;
@@ -46,8 +48,11 @@
 	}).add;
 
         // Still image frame, [placeholder sine osc to begin]
-        SynthDef("imgFrame", {arg freq = 440.0, brightness = 1;
-          Out.ar(0, SinOsc.ar(freq: freq, phase: 0.0, mul: brightness, add: 0.0) * Object.maskpicture.value)
+        SynthDef("imgFrame", {arg freq = 440.0, brightness = 1, bufnum = 0;
+          var sig, env;
+          sig = Osc.ar(bufnum, freq: freq, phase: 0.0, mul: brightness, add: 0.0);
+          env = EnvGen.kr(Env.new([1, 0.9, 0.01, 0.5, 1], [frame/6, frame/6, frame/6, frame/6*3], loopNode: 0, releaseNode: 3), doneAction: 0);
+          Out.ar(0, sig * env * Object.maskpicture.value)
         }).add;
 
 	// PAL line and frame sync for black / empty video signal
