@@ -48,11 +48,21 @@
 	}).add;
 
         // Still image frame, [placeholder sine osc to begin]
-        SynthDef("imgFrame", {arg freq = 440.0, brightness = 1, bufnum = 0;
-          var sig, env;
-          sig = Osc.ar(bufnum, freq: freq, phase: 0.0, mul: brightness, add: 0.0);
-          env = EnvGen.kr(Env.new([1, 0.9, 0.01, 0.5, 1], [frame/6, frame/6, frame/6, frame/6*3], loopNode: 0, releaseNode: 3), doneAction: 0);
-          Out.ar(0, sig * env * Object.maskpicture.value)
+        SynthDef("imgFrame", {arg freq = 440.0, brightness = 1, levelBuf = 0, durationBuf = 1;
+          var sig, controlCurve;
+          var demandLevels, demandDurs, targetLevel, segmentDuration;
+          var numPoints = BufFrames.kr(levelBuf);
+
+          demandLevels = Dseq(Dbufrd(levelBuf,    Dseries(0, 1, numPoints), loop: 0), inf);
+          demandDurs   = Dseq(Dbufrd(durationBuf, Dseries(0, 1, numPoints), loop: 0), inf);
+
+          segmentDuration = Duty.kr(demandDurs * frame, 0, demandDurs * frame);
+          targetLevel     = Duty.kr(demandDurs * frame, 0, demandLevels);
+
+          controlCurve = VarLag.kr(targetLevel, segmentDuration, warp: \lin);
+
+          sig = SinOsc.ar(freq, mul: brightness);
+	  Out.ar(0, sig * controlCurve * Object.maskpicture.value)
         }).add;
 
 	// PAL line and frame sync for black / empty video signal

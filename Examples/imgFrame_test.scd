@@ -5,7 +5,10 @@ var server = Server(\nrt,
 	.numInputBusChannels_(1)
 );
 
-var amps = [1.0, 0.2, 0.5, 0.1, 0.8];
+var amps = [1.0, 0.2, 0.5, 0.1];
+var durs = [0.25, 0.25, 0.25, 0.25];
+
+var totalDuration = 625 * 0.064 * 20;  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
 
 // Add CVBS SynthDefs
 Object.defineCVBS;
@@ -19,19 +22,22 @@ x = Ppar([
 	Pbind(
 		\instrument, "imgFrame",
 		\freq, 1500,
-		\bufnum, 0,
+		\levelBuf, 0,
+		\durationBuf, 1,
 		\brightness, 1,
 		\dur, Pseq([2], 1),
 	),
-]).asScore(625 * 0.064 * 20, timeOffset: 0.001);  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
-
-// Add the Buffer to the score
-x.add([0.0, [\b_alloc, 0, 64, 1]]);
-x.add([0.0, [\b_gen, 0, "sine1", 7] ++ amps]);
+]).asScore(totalDuration, timeOffset: 0.002);
 
 Object.namesCVBS.do { |name|
 	x.add([0.0, [\d_recv, SynthDescLib.global.at(name).def.asBytes]]);
 };
+
+// Add Buffers 0,1 (amps,durs) to the score
+x.add([0.0, [\b_alloc, 0, amps.size, 1]]);
+x.add([0.0, [\b_setn, 0, 0, amps.size] ++ amps]);
+x.add([0.0, [\b_alloc, 1, durs.size, 1]]);
+x.add([0.0, [\b_setn, 1, 0, durs.size] ++ durs]);
 
 x.sort;
 
@@ -40,8 +46,8 @@ x.recordNRT(
 	sampleRate: 28636,
 	headerFormat: "FLAC",
 	sampleFormat: "int8",
-	options: ServerOptions.new.numOutputBusChannels_(1),
-	duration: x.endTime,
+	options: server.options,
+	duration: totalDuration,
 	action: {
 		"CVBS-synth NRT render finished successfully.".postln;
 		0.exit;
