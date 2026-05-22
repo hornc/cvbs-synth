@@ -38,6 +38,11 @@ echo
 rm $flac
 sclang $script
 
+if [ ! -s $flac ]; then
+    echo $flac is 0 bytes! Signal not generated, something went wrong!
+    exit 1
+fi
+
 echo
 echo ======================================
 echo Decoding CVBS from $flac ... 
