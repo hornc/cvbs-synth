@@ -2,7 +2,8 @@
 // CVBS SynthDefs
 
 + Object {
-    namesCVBS { ^['vBar', 'hBar', 'hLine', 'Box', 'linePAL']; }
+    namesCVBS { ^['vBar', 'hBar', 'hLine', 'Box', 'imgFrame', 'linePAL']; }
+
     // Envelope mask to zero a signal (multiply) before mixing (adding) to the PAL frame and line sync signal (linePAL)
     maskpicture {
 	^LFPulse.ar(freq: 15.625, width: 1-(120/640), iphase: 1-(120/640) + 0.04,
@@ -14,7 +15,9 @@
     defineCVBS {
 	var h = 0.2,
 	center = -0.250,
-	v = -0.00135;
+	v = -0.00135,
+	frame = 40,  // Frame audio duration 40s = 1/25Hz * 1000(scale)
+	field = 20;  // two fields in a frame
 
 	// Vertical bar
 	SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.0;
@@ -44,6 +47,29 @@
 		Out.ar(0, LFPulse.ar(freq: 125/8, width: width * xscale, iphase: -1 * xscale * x - 0.161, mul: brightness) *
 			LFPulse.ar(freq: 1/20, width: height * yscale, iphase: -1 * yscale * y - 0.055) * Object.maskpicture.value)
 	}).add;
+
+        // Still image frame, [placeholder sine osc to begin]
+        SynthDef("imgFrame", {arg brightness = 1, levelBuf = 0, durationBuf = 1;
+          var sig, controlCurve;
+          var numPoints  = BufFrames.kr(levelBuf);
+          var fieldReset = Impulse.kr(1.0 / field);
+
+          var levelStream = Dbufrd(levelBuf,    Dseries(0, 1, numPoints), loop: 0);
+          var durStream   = Dbufrd(durationBuf, Dseries(0, 1, numPoints), loop: 0);
+
+          var paddedLevels = Dseq([0.0, levelStream, Dseq([0.0], inf)], 1);
+          var paddedDurs   = Dseq([durStream, Dseq([1.0], inf)], 1) * field;
+          controlCurve = DemandEnvGen.kr(
+            level: paddedLevels,
+            dur: paddedDurs,
+            shape: 0,  // 0 = \step
+            gate: 1,
+            reset: fieldReset
+          );
+          //sig = SinOsc.ar(1500, mul: brightness);
+          sig = brightness;
+          Out.ar(0, sig * controlCurve * Object.maskpicture.value)
+        }).add;
 
 	// PAL line and frame sync for black / empty video signal
 	// optional color burst signal via color arg
