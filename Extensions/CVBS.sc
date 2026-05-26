@@ -16,7 +16,8 @@
 	var h = 0.2,
 	center = -0.250,
 	v = -0.00135,
-	frame = 40;  // Frame audio duration 40s = 1/25Hz * 1000(scale)
+	frame = 40,  // Frame audio duration 40s = 1/25Hz * 1000(scale)
+	field = 20;  // two fields in a frame
 
 	// Vertical bar
 	SynthDef("vBar", {arg brightness = 1, width = 0.1, x = 0.0;
@@ -48,21 +49,23 @@
 	}).add;
 
         // Still image frame, [placeholder sine osc to begin]
-        SynthDef("imgFrame", {arg freq = 440.0, brightness = 1, levelBuf = 0, durationBuf = 1;
+        SynthDef("imgFrame", {arg brightness = 1, levelBuf = 0, durationBuf = 1;
           var sig, controlCurve;
           var demandLevels, demandDurs, targetLevel, segmentDuration;
           var numPoints = BufFrames.kr(levelBuf);
+          var frameReset = Impulse.kr(1.0 / field);
 
           demandLevels = Dseq(Dbufrd(levelBuf,    Dseries(0, 1, numPoints), loop: 0), inf);
           demandDurs   = Dseq(Dbufrd(durationBuf, Dseries(0, 1, numPoints), loop: 0), inf);
 
-          segmentDuration = Duty.kr(demandDurs * frame, 0, demandDurs * frame);
-          targetLevel     = Duty.kr(demandDurs * frame, 0, demandLevels);
+          segmentDuration = Duty.kr(demandDurs * field, frameReset, demandDurs * field);
+          targetLevel     = Duty.kr(demandDurs * field, frameReset, demandLevels);
 
-          controlCurve = VarLag.kr(targetLevel, segmentDuration, warp: \lin);
+          controlCurve = VarLag.kr(targetLevel, segmentDuration, warp: \step);
 
-          sig = SinOsc.ar(freq, mul: brightness);
-	  Out.ar(0, sig * controlCurve * Object.maskpicture.value)
+          //sig = SinOsc.ar(1500, mul: brightness);
+          sig = brightness;
+          Out.ar(0, sig * controlCurve * Object.maskpicture.value)
         }).add;
 
 	// PAL line and frame sync for black / empty video signal

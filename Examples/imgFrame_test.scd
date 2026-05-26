@@ -21,7 +21,6 @@ x = Ppar([
 	),
 	Pbind(
 		\instrument, "imgFrame",
-		\freq, 1500,
 		\levelBuf, 0,
 		\durationBuf, 1,
 		\brightness, 1,
