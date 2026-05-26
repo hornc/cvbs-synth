@@ -7,6 +7,9 @@ var server = Server(\nrt,
 
 var amps = [1.0, 0.2, 0.5, 0.1];
 var durs = [0.25, 0.25, 0.25, 0.25];
+//var amps = [0.2, 0.8, 0.6, 0.8, 1.0];
+//var durs = [0.05, 0.15, 0.30, 0.10, 0.40];
+
 
 var totalDuration = 625 * 0.064 * 20;  // 625 PAL lines * 64 micro (audio milli) s * number of frames to output
 

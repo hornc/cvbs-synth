@@ -51,18 +51,21 @@
         // Still image frame, [placeholder sine osc to begin]
         SynthDef("imgFrame", {arg brightness = 1, levelBuf = 0, durationBuf = 1;
           var sig, controlCurve;
-          var demandLevels, demandDurs, targetLevel, segmentDuration;
-          var numPoints = BufFrames.kr(levelBuf);
-          var frameReset = Impulse.kr(1.0 / field);
+          var numPoints  = BufFrames.kr(levelBuf);
+          var fieldReset = Impulse.kr(1.0 / field);
 
-          demandLevels = Dseq(Dbufrd(levelBuf,    Dseries(0, 1, numPoints), loop: 0), inf);
-          demandDurs   = Dseq(Dbufrd(durationBuf, Dseries(0, 1, numPoints), loop: 0), inf);
+          var levelStream = Dbufrd(levelBuf,    Dseries(0, 1, numPoints), loop: 0);
+          var durStream   = Dbufrd(durationBuf, Dseries(0, 1, numPoints), loop: 0);
 
-          segmentDuration = Duty.kr(demandDurs * field, frameReset, demandDurs * field);
-          targetLevel     = Duty.kr(demandDurs * field, frameReset, demandLevels);
-
-          controlCurve = VarLag.kr(targetLevel, segmentDuration, warp: \step);
-
+          var paddedLevels = Dseq([0.0, levelStream, Dseq([0.0], inf)], 1);
+          var paddedDurs   = Dseq([durStream, Dseq([1.0], inf)], 1) * field;
+          controlCurve = DemandEnvGen.kr(
+            level: paddedLevels,
+            dur: paddedDurs,
+            shape: 0,  // 0 = \step
+            gate: 1,
+            reset: fieldReset
+          );
           //sig = SinOsc.ar(1500, mul: brightness);
           sig = brightness;
           Out.ar(0, sig * controlCurve * Object.maskpicture.value)
